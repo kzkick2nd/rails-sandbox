@@ -1,0 +1,26 @@
+version: '3'
+services:
+  db:
+    image: mysql:8
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: 'passw0rd!'
+  app:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/usr/src/app:cached
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    environment:
+      DB_HOSTNAME: 'db'
+      DB_SOCKET: '/tmp/mysql.sock'
+
+volumes:
+  db_data:
